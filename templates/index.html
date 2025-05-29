@@ -4,126 +4,368 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Handwritten Digit Recognition</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom animations and gradients */
-        @keyframes slideIn {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(to bottom right, #f3f4f6, #e5e7eb);
+            min-height: 100vh;
         }
-        .gradient-bg {
-            background: linear-gradient(135deg, #6b48ff, #ff6b6b);
+
+        /* Navbar styles */
+        nav {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            position: fixed;
+            width: 100%;
+            z-index: 10;
         }
-        .toast {
-            animation: slideIn 0.5s ease-out forwards, fadeIn 0.5s ease-out;
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .button-hover {
-            transition: transform 0.3s ease, background-color 0.3s ease;
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: transparent;
+            background: linear-gradient(to right, #2563eb, #7c3aed);
+            -webkit-background-clip: text;
+            background-clip: text;
         }
-        .button-hover:hover {
-            transform: scale(1.05);
-            background-color: #4a44ce;
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
         }
-        .navbar-hover:hover {
+
+        .nav-links a {
+            color: #4b5563;
+            text-decoration: none;
+            padding: 0.5rem 0.75rem;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .nav-links a:hover {
             background-color: #e0e7ff;
             border-radius: 0.375rem;
+            color: #2563eb;
         }
-        /* Hamburger menu animation */
+
+        /* Hamburger menu */
         .hamburger {
             cursor: pointer;
+            display: none;
+        }
+
+        .bar {
+            width: 1.5rem;
+            height: 0.125rem;
+            background-color: #4b5563;
+            display: block;
+            margin-bottom: 0.25rem;
             transition: all 0.3s ease;
         }
+
         .hamburger.active .bar:nth-child(2) {
             opacity: 0;
         }
+
         .hamburger.active .bar:nth-child(1) {
             transform: translateY(8px) rotate(45deg);
         }
+
         .hamburger.active .bar:nth-child(3) {
             transform: translateY(-8px) rotate(-45deg);
         }
+
         .nav-menu {
-            display: flex;
-            height: auto;
-            transition: height 0.3s ease;
-        }
-        .nav-menu.active {
-            display: flex;
+            display: none;
             flex-direction: column;
             position: absolute;
             top: 60px;
             left: 0;
             right: 0;
-            background-color: white;
+            background-color: #ffffff;
             padding: 1rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: height 0.3s ease;
         }
+
+        .nav-menu.active {
+            display: flex;
+        }
+
+        /* Main content */
+        .main-content {
+            padding-top: 5rem;
+            padding-bottom: 2.5rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            background-color: #ffffff;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 28rem;
+            width: 100%;
+            border: 1px solid #e5e7eb;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.875rem;
+            font-weight: bold;
+            text-align: center;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+        }
+
+        .file-input-label {
+            display: block;
+            font-size: 0.875rem;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-input {
+            display: block;
+            width: 100%;
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .file-input::-webkit-file-upload-button {
+            margin-right: 1rem;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 9999px;
+            background: linear-gradient(to right, #dbeafe, #f3e8ff);
+            color: #374151;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .file-input::-webkit-file-upload-button:hover {
+            background: linear-gradient(to right, #bfdbfe, #e9d5ff);
+        }
+
+        .predict-button {
+            width: 100%;
+            margin-top: 10px;
+            background: linear-gradient(to right, #3b82f6, #9333ea);
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .predict-button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(to right, #2563eb, #7c3aed);
+        }
+
+        .result {
+            margin-top: 1.5rem;
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .preview {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: opacity 0.3s ease;
+        }
+
+        .preview-image.hidden {
+            display: none;
+        }
+
+        .feedback {
+            margin-top: 1.5rem;
+        }
+
+        .feedback.hidden {
+            display: none;
+        }
+
+        .feedback p {
+            font-size: 1.125rem;
+            color: #374151;
+        }
+
+        .feedback-input {
+            border: 1px solid #d1d5db;
+            padding: 0.5rem;
+            width: 5rem;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .feedback-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.5);
+        }
+
+        .feedback-button {
+            margin-top: 0.5rem;
+            background-color: #6b7280;
+            color: #ffffff;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .feedback-button:hover {
+            background-color: #4b5563;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #ffffff;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            margin-top: auto;
+            text-align: center;
+        }
+
+        footer p {
+            text-align: center;
+            color: #4b5563;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            background-color: #22c55e;
+            color: #ffffff;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transform: translateY(100%);
+            animation: slideIn 0.5s ease-out forwards, fadeIn 0.5s ease-out;
+        }
+
+        .toast.hidden {
+            display: none;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Responsive design */
         @media (max-width: 640px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
             .nav-menu {
                 display: none;
             }
+
             .nav-menu.active {
                 display: flex;
             }
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen font-sans">
+<body>
     <!-- Navbar -->
-    <nav class="bg-white shadow-md p-4 fixed w-full z-10">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="#" class="text-2xl font-bold text-gray-800 gradient-text bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">DigitRec</a>
-            <div class="md:flex space-x-4 hidden md:block">
-                <a href="https://github.com/yourusername/digit-recognition" target="_blank" class="text-gray-600 hover:text-blue-600 navbar-hover px-3 py-2 transition-colors duration-200">Code</a>
+    <nav>
+        <div class="container">
+            <a href="#" class="brand">DigitRec</a>
+            <div class="nav-links">
+                <a href="https://github.com/yourusername/digit-recognition" target="_blank">Code</a>
             </div>
-            <div class="md:hidden">
-                <div class="hamburger" id="hamburger">
-                    <span class="bar w-6 h-1 bg-gray-600 block mb-1"></span>
-                    <span class="bar w-6 h-1 bg-gray-600 block mb-1"></span>
-                    <span class="bar w-6 h-1 bg-gray-600 block"></span>
-                </div>
+            <div class="hamburger" id="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
             </div>
         </div>
-        <div class="nav-menu hidden" id="navMenu">
-            <a href="https://github.com/codewithmishra-ashish/digit-recognition-webapp" target="_blank" class="block text-gray-600 hover:text-blue-600 navbar-hover px-3 py-2 transition-colors duration-200">Code</a>
+        <div class="nav-menu" id="navMenu">
+            <a href="https://github.com/yourusername/digit-recognition" target="_blank">Code</a>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <div class="pt-20 pb-10"> <!-- Padding to account for fixed navbar -->
-        <div class="container mx-auto flex items-center justify-center min-h-screen">
-            <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md transform transition-all duration-300 hover:shadow-2xl border border-gray-200">
-                <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Handwritten Digit Recognition</h1>
-                <div class="mb-6">
-                    <label for="imageInput" class="block w-full text-sm text-gray-600 mb-2">Upload Digit Image</label>
-                    <input type="file" id="imageInput" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r from-blue-100 to-purple-100 file:text-gray-700 hover:file:bg-gradient-to-r hover:from-blue-200 hover:to-purple-200">
-                </div>
-                <button id="predictBtn" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-6 rounded-lg button-hover text-lg font-semibold">Predict</button>
-                <div id="result" class="mt-6 text-center text-xl font-medium text-gray-700"></div>
-                <div id="preview" class="mt-6 flex justify-center">
-                    <img id="previewImage" class="hidden max-w-full h-auto rounded-lg shadow-md transition-opacity duration-300" alt="Image Preview">
-                </div>
-                <div id="feedback" class="mt-6 hidden">
-                    <p class="text-lg text-gray-700">Is the prediction correct?</p>
-                    <input type="text" id="correctDigit" min="0" max="9" class="border border-gray-300 p-2 w-20 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
-                    <button id="submitFeedback" class="mt-2 bg-gray-500 text-white py-2 px-4 rounded-lg button-hover hover:bg-gray-600">Submit Feedback</button>
-                </div>
+    <div class="main-content">
+        <div class="card">
+            <h1 class="card-title">Handwritten Digit Recognition</h1>
+            <div>
+                <label for="imageInput" class="file-input-label">Upload Digit Image</label>
+                <input type="file" id="imageInput" accept="image/*" class="file-input">
+            </div>
+            <button id="predictBtn" class="predict-button">Predict</button>
+            <div id="result" class="result"></div>
+            <div id="preview" class="preview">
+                <img id="previewImage" class="preview-image hidden" alt="Image Preview">
+            </div>
+            <div id="feedback" class="feedback hidden">
+                <p>Is the prediction correct?</p>
+                <input type="text" id="correctDigit" min="0" max="9" class="feedback-input">
+                <button id="submitFeedback" class="feedback-button">Submit Feedback</button>
             </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="bg-white shadow-inner p-4 mt-auto">
-        <div class="container mx-auto text-center text-gray-600">
+    <footer>
+        <div class="container">
             <p>© 2025 Digit Recognition App. All rights reserved.</p>
         </div>
     </footer>
 
-    <div id="toast" class="hidden fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg toast transform translate-y-full">
+    <div id="toast" class="toast hidden">
         Prediction successful!
     </div>
 
@@ -155,7 +397,7 @@
         predictBtn.addEventListener('click', async () => {
             const file = imageInput.files[0];
             if (!file) {
-                result.innerHTML = '<p class="text-red-500">Please upload an image.</p>';
+                result.innerHTML = '<p style="color: #ef4444;">Please upload an image.</p>';
                 return;
             }
 
@@ -170,9 +412,9 @@
                 const data = await response.json();
 
                 if (data.error) {
-                    result.innerHTML = `<p class="text-red-500">${data.error}</p>`;
+                    result.innerHTML = `<p style="color: #ef4444;">${data.error}</p>`;
                 } else {
-                    result.innerHTML = `<p class="text-lg font-semibold">Predicted Digit: ${data.digit} (Confidence: ${(data.confidence * 100).toFixed(2)}%)</p>`;
+                    result.innerHTML = `<p style="font-size: 1.25rem; font-weight: 500;">Predicted Digit: ${data.digit} (Confidence: ${(data.confidence * 100).toFixed(2)}%)</p>`;
                     toast.classList.remove('hidden');
                     toast.classList.remove('translate-y-full');
                     setTimeout(() => {
@@ -182,13 +424,13 @@
                     feedback.classList.remove('hidden');
                 }
             } catch (error) {
-                result.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+                result.innerHTML = `<p style="color: #ef4444;">Error: ${error.message}</p>`;
             }
         });
 
         document.getElementById('submitFeedback').addEventListener('click', async () => {
             const correctDigit = document.getElementById('correctDigit').value;
-            if (correctDigit){
+            if (correctDigit) {
                 await fetch('/feedback', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
