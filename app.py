@@ -4,6 +4,8 @@ import numpy as np
 from PIL import Image
 import io
 import os
+import json
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -29,10 +31,8 @@ def load_or_train_model():
             tf.keras.layers.Dense(10, activation='softmax')
         ])
 
-        # Compile the model
+        # Compile and train the model
         model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-
-        # Train the model (adjust epochs here)
         print("Training model... This may take a few minutes.")
         model.fit(x_train, y_train, epochs=10, validation_data=(x_test, y_test), verbose=1)
         model.save(model_path)
@@ -72,6 +72,28 @@ def predict():
             'digit': int(predicted_digit),
             'confidence': confidence
         })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/feedback', methods=['POST'])
+def feedback():
+    data = request.json
+    digit = data.get('correctDigit')
+    with open('feedback.json', 'a') as f:
+        json.dump({'digit': digit, 'timestamp': str(datetime.now())}, f)
+        f.write('\n')
+    return jsonify({'message': 'Feedback received'})
+
+@app.route('/get_feedback', methods=['GET'])
+def get_feedback():
+    try:
+        feedback_list = []
+        if os.path.exists('feedback.json'):
+            with open('feedback.json', 'r') as f:
+                for line in f:
+                    if line.strip():
+                        feedback_list.append(json.loads(line))
+        return jsonify(feedback_list)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
