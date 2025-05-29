@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Handwritten Digit Recognition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom animations and gradients */
+        @keyframes slideIn {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #6b48ff, #ff6b6b);
+        }
+        .toast {
+            animation: slideIn 0.5s ease-out forwards, fadeIn 0.5s ease-out;
+        }
+        .button-hover {
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+        .button-hover:hover {
+            transform: scale(1.05);
+            background-color: #4a44ce;
+        }
+        .navbar-hover:hover {
+            background-color: #e0e7ff;
+            border-radius: 0.375rem;
+        }
+        /* Hamburger menu animation */
+        .hamburger {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .hamburger.active .bar:nth-child(2) {
+            opacity: 0;
+        }
+        .hamburger.active .bar:nth-child(1) {
+            transform: translateY(8px) rotate(45deg);
+        }
+        .hamburger.active .bar:nth-child(3) {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+        .nav-menu {
+            display: flex;
+            height: auto;
+            transition: height 0.3s ease;
+        }
+        .nav-menu.active {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 60px;
+            left: 0;
+            right: 0;
+            background-color: white;
+            padding: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        @media (max-width: 640px) {
+            .nav-menu {
+                display: none;
+            }
+            .nav-menu.active {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-100 to-gray-200 min-h-screen font-sans">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md p-4 fixed w-full z-10">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-gray-800 gradient-text bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">DigitRec</a>
+            <div class="md:flex space-x-4 hidden md:block">
+                <a href="https://github.com/yourusername/digit-recognition" target="_blank" class="text-gray-600 hover:text-blue-600 navbar-hover px-3 py-2 transition-colors duration-200">Code</a>
+            </div>
+            <div class="md:hidden">
+                <div class="hamburger" id="hamburger">
+                    <span class="bar w-6 h-1 bg-gray-600 block mb-1"></span>
+                    <span class="bar w-6 h-1 bg-gray-600 block mb-1"></span>
+                    <span class="bar w-6 h-1 bg-gray-600 block"></span>
+                </div>
+            </div>
+        </div>
+        <div class="nav-menu hidden" id="navMenu">
+            <a href="https://github.com/yourusername/digit-recognition" target="_blank" class="block text-gray-600 hover:text-blue-600 navbar-hover px-3 py-2 transition-colors duration-200">Code</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="pt-20 pb-10"> <!-- Padding to account for fixed navbar -->
+        <div class="container mx-auto flex items-center justify-center min-h-screen">
+            <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md transform transition-all duration-300 hover:shadow-2xl border border-gray-200">
+                <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Handwritten Digit Recognition</h1>
+                <div class="mb-6">
+                    <label for="imageInput" class="block w-full text-sm text-gray-600 mb-2">Upload Digit Image</label>
+                    <input type="file" id="imageInput" accept="image/*" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r from-blue-100 to-purple-100 file:text-gray-700 hover:file:bg-gradient-to-r hover:from-blue-200 hover:to-purple-200">
+                </div>
+                <button id="predictBtn" class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-6 rounded-lg button-hover text-lg font-semibold">Predict</button>
+                <div id="result" class="mt-6 text-center text-xl font-medium text-gray-700"></div>
+                <div id="preview" class="mt-6 flex justify-center">
+                    <img id="previewImage" class="hidden max-w-full h-auto rounded-lg shadow-md transition-opacity duration-300" alt="Image Preview">
+                </div>
+                <div id="feedback" class="mt-6 hidden">
+                    <p class="text-lg text-gray-700">Is the prediction correct?</p>
+                    <input type="number" id="correctDigit" min="0" max="9" class="border border-gray-300 p-2 w-20 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <button id="submitFeedback" class="mt-2 bg-gray-500 text-white py-2 px-4 rounded-lg button-hover hover:bg-gray-600">Submit Feedback</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white shadow-inner p-4 mt-auto">
+        <div class="container mx-auto text-center text-gray-600">
+            <p>© 2025 Digit Recognition App. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div id="toast" class="hidden fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg toast transform translate-y-full">
+        Prediction successful!
+    </div>
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const predictBtn = document.getElementById('predictBtn');
+        const result = document.getElementById('result');
+        const previewImage = document.getElementById('previewImage');
+        const toast = document.getElementById('toast');
+        const feedback = document.getElementById('feedback');
+        const hamburger = document.getElementById('hamburger');
+        const navMenu = document.getElementById('navMenu');
+
+        // Toggle hamburger menu
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                previewImage.src = URL.createObjectURL(file);
+                previewImage.classList.remove('hidden');
+                previewImage.classList.add('opacity-100');
+            }
+        });
+
+        predictBtn.addEventListener('click', async () => {
+            const file = imageInput.files[0];
+            if (!file) {
+                result.innerHTML = '<p class="text-red-500">Please upload an image.</p>';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
+                if (data.error) {
+                    result.innerHTML = `<p class="text-red-500">${data.error}</p>`;
+                } else {
+                    result.innerHTML = `<p class="text-lg font-semibold">Predicted Digit: ${data.digit} (Confidence: ${(data.confidence * 100).toFixed(2)}%)</p>`;
+                    toast.classList.remove('hidden');
+                    toast.classList.remove('translate-y-full');
+                    setTimeout(() => {
+                        toast.classList.add('translate-y-full');
+                        setTimeout(() => toast.classList.add('hidden'), 500);
+                    }, 3000);
+                    feedback.classList.remove('hidden');
+                }
+            } catch (error) {
+                result.innerHTML = `<p class="text-red-500">Error: ${error.message}</p>`;
+            }
+        });
+
+        document.getElementById('submitFeedback').addEventListener('click', async () => {
+            const correctDigit = document.getElementById('correctDigit').value;
+            if (correctDigit >= 0 && correctDigit <= 9) {
+                await fetch('/feedback', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ correctDigit })
+                });
+                alert('Feedback submitted!');
+                feedback.classList.add('hidden');
+            } else {
+                alert('Please enter a digit between 0 and 9.');
+            }
+        });
+    </script>
+</body>
+</html>
