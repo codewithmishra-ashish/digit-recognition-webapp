@@ -109,7 +109,7 @@
                 </div>
                 <div id="feedback" class="mt-6 hidden">
                     <p class="text-lg text-gray-700">Is the prediction correct?</p>
-                    <input type="number" id="correctDigit" min="0" max="9" class="border border-gray-300 p-2 w-20 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <input type="text" id="correctDigit" min="0" max="9" class="border border-gray-300 p-2 w-20 rounded-lg mt-2 focus:outline-none focus:ring-2 focus:ring-purple-500">
                     <button id="submitFeedback" class="mt-2 bg-gray-500 text-white py-2 px-4 rounded-lg button-hover hover:bg-gray-600">Submit Feedback</button>
                 </div>
             </div>
@@ -188,7 +188,7 @@
 
         document.getElementById('submitFeedback').addEventListener('click', async () => {
             const correctDigit = document.getElementById('correctDigit').value;
-            if (correctDigit >= 0 && correctDigit <= 9) {
+            if (correctDigit){
                 await fetch('/feedback', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
